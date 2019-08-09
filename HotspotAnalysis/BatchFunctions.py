@@ -11,7 +11,9 @@ def loadImagesROIs(filesDir):
     roiDir = (filesDir + 'ROIs/')
     
     images = os.listdir(imgDir)
+    images.sort()
     ROIs = os.listdir(roiDir)
+    ROIs.sort()
     
     if len(images) == len(ROIs):
         pass

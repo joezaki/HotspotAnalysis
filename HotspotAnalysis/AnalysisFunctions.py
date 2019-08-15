@@ -18,8 +18,8 @@ from tqdm import tqdm_notebook
 def loadImage(imgPath, imgName):
     if imgName.split(".")[1] == 'czi':
         image = czifile.imread(imgPath + imgName)
-        DAPI = image[0,:,:,0]
-        img = image[1,:,:,0]
+        DAPI = image[0,0,0,0,:,:,0]
+        img = image[0,1,0,0,:,:,0]
 
     elif imgName.split(".")[1] == 'tif' or imgName.split(".")[1] == 'tiff':
         image = cv2.imread(imgPath + imgName)
@@ -54,7 +54,7 @@ def Getis(mask, maskedImage, nx, ny):
                           'Z-Score':[],'p-value':[],'Sign':[]})
     maskedImage = maskedImage.astype(float)
     im = maskedImage.copy()
-    n = np.sum(mask)
+    n = np.sum(mask, dtype=float)
     # Iterate through each neighborhood
     coords = [[]]
     for x in np.arange(nx,im.shape[0] - (int(nx/2)),nx):

@@ -15,16 +15,16 @@ import scipy.stats as st
 from tqdm import tqdm_notebook
 
 # Load image file based on file type
-def loadImage(imgPath, imgName):
+def loadImage(imgPath, imgName, img_channel=1, DAPI_channel=0):
     if imgName.split(".")[1] == 'czi':
         image = czifile.imread(imgPath + imgName)
-        DAPI = image[0,0,0,0,:,:,0]
-        img = image[0,1,0,0,:,:,0]
+        DAPI = image[0,DAPI_channel,0,0,:,:,0]
+        img  = image[0,img_channel,0,0,:,:,0]
 
     elif imgName.split(".")[1] == 'tif' or imgName.split(".")[1] == 'tiff':
         image = cv2.imread(imgPath + imgName)
-        DAPI = image[:,:,1]
-        img = image[:,:,2]
+        DAPI = image[:,:,DAPI_channel]
+        img  = image[:,:,img_channel]
     else:
         raise Exception("Image file is not of an appropriate file format for hotspot analysis (i.e. TIFF or CZI)")
     return img, DAPI

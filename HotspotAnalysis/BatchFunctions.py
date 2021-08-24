@@ -29,7 +29,7 @@ def loadImagesROIs(filesDir):
 
 
 
-def BatchHotspot(filesDir, images, ROIs, threshold, downsample, nx, ny):
+def BatchHotspot(filesDir, images, ROIs, threshold, downsample, nx, ny, saveDir=None):
 
     for i in range(len(images)):
         os.chdir(filesDir)
@@ -61,9 +61,12 @@ def BatchHotspot(filesDir, images, ROIs, threshold, downsample, nx, ny):
         stats = Getis(mask, maskedImage, nx, ny)
         direction, zs, DL, VL, DM, VM, MLaxisZs, DVaxisZs, quadrantStds = processedStats(stats, maskedImage, name)
         
-        
         # Create new folder for images
-        path = "./" + name
+        if saveDir is None:
+            path = "./" + name
+        else:
+            path = saveDir
+
         try:
             os.mkdir(path)
         except OSError:

@@ -58,6 +58,39 @@ def make_ROI(img, DAPI, region, vertices):
     return ROI_masks, mask, croppedImg, maskedImage, fig1, fig2
 
 
+def load_ROI(img, DAPI, roiPath):
+    
+    # load mask using the roiPath
+    mask = cv2.imread('./ROIs/' + ROIs[i])[:,:,0].astype(bool)
+    
+    # create mask as in make_ROI function
+    maskedImage = np.ma.array(img, mask = ~mask)
+    xrange = np.nanargmin(maskedImage, axis=1)
+    yrange = np.nanargmin(maskedImage, axis=0)
+    xmin = next((i for i, x in enumerate(xrange) if x), None)
+    xmax = len(xrange) - next((i for i, x in enumerate(np.flip(xrange, axis=0)) if x), None)
+    ymin = next((i for i, x in enumerate(yrange) if x), None)
+    ymax = len(yrange) - next((i for i, x in enumerate(np.flip(yrange, axis=0)) if x), None)
+    croppedImg = img[xmin:xmax,ymin:ymax]
+    mask = mask[xmin:xmax,ymin:ymax]
+    maskedImage = maskedImage[xmin:xmax,ymin:ymax]
+    
+    fig1 = plt.figure(figsize=(25,15))
+    plt.imshow(img*ROI_masks['ROI'], cmap='pink')
+    plt.imshow(img, cmap='gist_gray', alpha=0.6)
+    plt.plot([xs[-1],xs[0]],[ys[-1],ys[0]], 'ro-', alpha=0.2)
+    for i in range(0, len(xs)):
+        plt.plot(xs[i:i+2], ys[i:i+2], 'ro-', alpha=0.2)
+    
+    fig2 = plt.figure(figsize=(30,20))
+    plt.subplot(121)
+    plt.imshow(croppedImg, cmap='gist_gray')
+    plt.subplot(122)
+    plt.imshow(maskedImage, cmap='gist_gray')
+    plt.title("Processed Image; Ready for Analysis")
+    
+    return ROI_masks, mask, croppedImg, maskedImage, fig1, fig2
+
 
 # Define function that allows you to draw your ROI
 def ROI_plot(reference,region_names):

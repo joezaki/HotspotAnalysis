@@ -8,6 +8,7 @@ Created on Sat Jul 20 19:27:41 2019
 
 # Analysis Functions for Getis Ord Hotspot Analysis
 import czifile
+import os
 import cv2
 import numpy as np
 import pandas as pd
@@ -17,12 +18,12 @@ from tqdm import tqdm_notebook
 # Load image file based on file type
 def loadImage(imgPath, imgName, img_channel=1, DAPI_channel=0):
     if imgName.split(".")[1] == 'czi':
-        image = czifile.imread(imgPath + imgName)
+        image = czifile.imread(os.path.join(imgPath, imgName))
         DAPI = image[0,DAPI_channel,0,0,:,:,0]
         img  = image[0,img_channel,0,0,:,:,0]
 
     elif imgName.split(".")[1] == 'tif' or imgName.split(".")[1] == 'tiff':
-        image = cv2.imread(imgPath + imgName)
+        image = cv2.imread(os.path.join(imgPath, imgName))
         DAPI = image[:,:,DAPI_channel]
         img  = image[:,:,img_channel]
     else:

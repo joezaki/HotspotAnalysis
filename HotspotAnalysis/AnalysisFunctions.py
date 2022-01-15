@@ -10,6 +10,7 @@ Created on Sat Jul 20 19:27:41 2019
 import czifile
 import os
 import cv2
+from skimage import io
 import numpy as np
 import pandas as pd
 import scipy.stats as st
@@ -23,9 +24,10 @@ def loadImage(imgPath, imgName, img_channel=1, DAPI_channel=0):
         img  = image[0,img_channel,0,0,:,:,0]
 
     elif imgName.split(".")[1] == 'tif' or imgName.split(".")[1] == 'tiff':
-        image = cv2.imread(os.path.join(imgPath, imgName))
-        DAPI = image[:,:,DAPI_channel]
-        img  = image[:,:,img_channel]
+        #image = cv2.imread(os.path.join(imgPath, imgName))
+        image = io.imread(os.path.join(imgPath, imgName))
+        DAPI = image[DAPI_channel,:,:]
+        img  = image[img_channel,:,:]
     else:
         raise Exception("Image file is not of an appropriate file format for hotspot analysis (i.e. TIFF or CZI)")
     return img, DAPI

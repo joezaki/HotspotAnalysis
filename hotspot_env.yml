@@ -1,0 +1,24 @@
+channels:
+    - conda-forge
+  dependencies:
+    - bokeh
+    - jupyter
+    - matplotlib
+    - numpy
+    - opencv
+    - pandas
+    - pingouin
+    - plotly
+    - python
+    - pyyaml
+    - scikit-learn
+    - scikit-image
+    - scipy
+    - seaborn
+    - statsmodels
+    - tqdm
+    - pip
+    - python-kaleido
+    - holoviews
+    - imageio
+    - czifile

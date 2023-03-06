@@ -169,4 +169,4 @@ def ZdistributionPlot(stats, name):
                  hist_kws={'edgecolor':'black'})
     plt.title((name + " Z-Scores of Data"))
     plt.ylabel("Frequency")
-    #return ZdistributionPlot
+    return ZdistributionPlot

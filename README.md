@@ -3,6 +3,14 @@
 
 This analysis pipeline uses the Getis-Ord Gi statistic (Getis & Ord, 1992) to measure spatial autocorrelation of pixel intensity values across a microscope image. The Gi statistic is commonly referred to as "Hotspot Analysis." The premise of this analysis is explained below.
 
+To get started using the pipeline:
+1. Make sure you have Anaconda installed on your computer
+2. Navigate to your desired folder destination via terminal and type `git clone github.com/joezaki/HotspotAnalysis`
+3. Then type `cd HotspotAnalysis/`
+4. Type `conda env create -n hotspot -f hotspot_env.yml` to create the environment
+5. To use jupyter through a browser, type `source activate hotspot` in terminal and finally, `jupyter notebook` which should automatically open a browser.
+6. Instead, you can use an IDE such as Visual Studio Code to run the pipeline.
+
 ![](HotspotImages/ImageAsMatrix.png)
 
 In hotspot analysis, we are interested in the density of pixel values in a specified area of an image. In

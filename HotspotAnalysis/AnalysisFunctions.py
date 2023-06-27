@@ -16,6 +16,9 @@ import pandas as pd
 import scipy.stats as st
 from tqdm import tqdm_notebook
 
+import dask
+from dask.diagnostics import ProgressBar
+
 # Load image file based on file type
 def loadImage(imgPath, imgName, img_channel=1, DAPI_channel=0):
     if imgName.split(".")[1] == 'czi':
@@ -93,6 +96,65 @@ def Getis(mask, maskedImage, nx, ny):
         stats = stats.append(stat, ignore_index=True)
     return stats
 
+
+def Getis_per_neighborhood(im, n, coord, nx=20, ny=20):
+    x = coord[0]
+    y = coord[1]
+    wdxj = neighbours(im, x, y, int(nx/2), int(ny/2))
+    Sxj = np.sum(im)
+    Gi = np.sum(wdxj) / Sxj
+    Yi1 = Sxj / n
+    Sxj2 = np.sum(im**2)
+    Yi2 = Sxj2 / n - Yi1**2
+    Wi = wdxj.size
+    EGi = Wi / n
+    Var = Wi*(n - Wi)*Yi2 / ((n**2)*(n - 1)*(Yi1**2))
+    Zi = (Gi - EGi) / np.sqrt(Var)
+    p = st.norm.pdf(Zi)
+    if Zi >= 0:
+        sign = "+"
+    else:
+        sign = "-"
+    # return x, y, Gi, Mean, Variance, SD, Z-score, p-value, sign
+    stat = pd.Series({'x':x, 'y':y, 'nx':nx, 'ny':ny,
+                        'Gi':np.round(Gi,10), 'Mean':np.round(Yi1,10),
+                        'Variance' : np.round(Var,10), 'SD':np.round(np.sqrt(Var),10),
+                        'Z-Score':np.round(Zi,10), 'p-value':np.round(p,20), 'Sign':sign})
+    return stat
+
+
+def Getis_parallel(mask, maskedImage, nx, ny):
+    stats = pd.DataFrame({'x':pd.Series(dtype='float'),
+                          'y':pd.Series(dtype='float'),
+                          'nx':pd.Series(dtype='float'),
+                          'nx':pd.Series(dtype='float'),
+                          'Gi':pd.Series(dtype='float'),
+                          'Mean':pd.Series(dtype='float'),
+                          'Variance':pd.Series(dtype='float'),
+                          'SD':pd.Series(dtype='float'),
+                          'Z-Score':pd.Series(dtype='float'),
+                          'p-value':pd.Series(dtype='float'),
+                          'Sign':pd.Series(dtype='str')})
+    maskedImage = maskedImage.astype(float)
+    im = maskedImage.copy()
+    n = np.sum(mask, dtype=float)
+    # Iterate through each neighborhood
+    coords = [[]]
+    for x in np.arange(nx,im.shape[0] - (int(nx/2)),nx):
+        for y in np.arange(ny,im.shape[1] - (int(ny/2)),ny):
+            isValid = neighbours(mask, x, y, int(nx/2), int(ny/2))
+            # Get G statistic for this neighborhood
+            if np.sum(isValid) == isValid.size:
+                coords.append((x,y))
+            else:
+                continue
+    
+    delayed_results = [dask.delayed(Getis_per_neighborhood)(im, n, coord) for coord in coords[1:]]
+    with ProgressBar():
+        results = dask.compute(delayed_results, scheduler='processes')[0]
+    stats = stats.append(results, sort=False)
+    stats = stats[['x', 'y', 'nx', 'ny', 'Gi', 'Mean', 'Variance', 'SD', 'Z-Score', 'p-value', 'Sign']]
+    return stats
 
 
 def processedStats(stats, img, name):
